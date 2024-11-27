@@ -26,16 +26,24 @@
             border-right: none;
             border-bottom: 2px solid grey;
         }
+
+        .divider {
+            width: 5px;
+            cursor: ew-resize;
+            background-color: grey;
+        }
     </style>
 </head>
 
 <body>
 
     <div id="editor"></div>
+    <div class="divider" id="divider"></div>
     <div id="preview"></div>
 
     <script src="./loader.js"></script>
     <script>
+        let keywords = ['LEFT', 'RIGHT', 'BREAK'];
         require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs' } });
         require(['vs/editor/editor.main'], function () {
             const editor = monaco.editor.create(document.getElementById('editor'), {
@@ -48,9 +56,33 @@
                 const content = editor.getValue();
                 document.getElementById('preview').innerHTML = content;
             });
+            const divider = document.getElementById('divider');
+            let isDragging = false;
+
+            divider.addEventListener('mousedown', (e) => {
+                isDragging = true;
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    const editorWidth = e.clientX;
+                    const previewWidth = window.innerWidth - editorWidth - divider.offsetWidth;
+                    if (editorWidth > 100 && previewWidth > 100) {
+                        document.getElementById('editor').style.width = `${editorWidth}px`;
+                        document.getElementById('preview').style.width = `${previewWidth}px`;
+                    }
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
 
 
         });
+
+
+
     </script>
 
 </body>
